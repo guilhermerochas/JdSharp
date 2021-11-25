@@ -6,7 +6,7 @@ namespace JdSharp.JarDecompiler.Constants
     {
         public uint Value { get; }
 
-        public IntegerConstant(uint value) : base((uint)ConstantEnums.Integer)
+        public IntegerConstant(uint value) : base((uint)ConstantEnum.Integer)
             => Value = value;
     }
 }

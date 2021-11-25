@@ -6,7 +6,7 @@ namespace JdSharp.JarDecompiler.Constants
     {
         public double Value { get; }
 
-        public DoubleConstant(double value) : base((uint)ConstantEnums.Double)
+        public DoubleConstant(double value) : base((uint)ConstantEnum.Double)
         {
             Value = value;
         }

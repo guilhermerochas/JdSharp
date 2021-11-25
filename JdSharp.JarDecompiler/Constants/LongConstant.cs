@@ -6,7 +6,7 @@ namespace JdSharp.JarDecompiler.Constants
     {
         public ulong Value { get; }
         
-        public LongConstant(ulong value) : base((uint)ConstantEnums.Long)
+        public LongConstant(ulong value) : base((uint)ConstantEnum.Long)
         {
             Value = value;
         }

@@ -6,7 +6,7 @@ namespace JdSharp.JarDecompiler.Constants
     {
         public ushort StringIndex { get; }
 
-        public StringConstant(ushort stringIndex) : base((uint)ConstantEnums.String)
+        public StringConstant(ushort stringIndex) : base((uint)ConstantEnum.String)
         {
             StringIndex = stringIndex;
         }

@@ -6,7 +6,7 @@ namespace JdSharp.JarDecompiler.Constants
     {
         public ushort DescriptorIndex { get; }
 
-        public MethodTypeConstant(ushort descriptorIndex) : base((uint)ConstantEnums.MethodType)
+        public MethodTypeConstant(ushort descriptorIndex) : base((uint)ConstantEnum.MethodType)
         {
             DescriptorIndex = descriptorIndex;
         }

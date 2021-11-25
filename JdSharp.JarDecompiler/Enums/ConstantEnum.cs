@@ -1,6 +1,6 @@
 ﻿namespace JdSharp.JarDecompiler.Enums
 {
-    public enum ConstantEnums : uint
+    public enum ConstantEnum : uint
     {
         Utf8 = 1,
         Integer = 3,

@@ -1,5 +1,4 @@
-﻿using System.IO;
-using JdSharp.JarDecompiler.Enums;
+﻿using JdSharp.JarDecompiler.Enums;
 
 namespace JdSharp.JarDecompiler.Constants
 {
@@ -7,7 +6,7 @@ namespace JdSharp.JarDecompiler.Constants
     {
         public string Value { get; }
 
-        public Utf8Constant(string value) : base((uint) ConstantEnums.Utf8)
+        public Utf8Constant(string value) : base((uint) ConstantEnum.Utf8)
         {
             Value = value;
         }

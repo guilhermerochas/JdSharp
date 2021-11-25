@@ -7,7 +7,7 @@ namespace JdSharp.JarDecompiler.Constants
         public ushort ClassIndex { get; }
         public ushort NameAndTypeIndex { get; }
 
-        public MemberRefConstant(ushort classIndex, ushort nameAndTypeIndex) : base((uint)ConstantEnums.MemberRef)
+        public MemberRefConstant(ushort classIndex, ushort nameAndTypeIndex) : base((uint)ConstantEnum.MemberRef)
         {
             ClassIndex = classIndex;
             NameAndTypeIndex = nameAndTypeIndex;

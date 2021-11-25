@@ -6,7 +6,7 @@ namespace JdSharp.JarDecompiler.Constants
     {
         public float Value { get; }
 
-        public FloatConstant(float value) : base((uint)ConstantEnums.Float)
+        public FloatConstant(float value) : base((uint)ConstantEnum.Float)
             => Value = value;
     }
 }
