@@ -14,8 +14,8 @@ namespace JdSharp.Cli
             if (!File.Exists(filePath) || string.IsNullOrEmpty(filePath))
                 throw new Exception("file not found!");
             
-            using var binaryReader = new EndianessBinaryReader(File.OpenRead(filePath));
-            JavaClassFile classFile = new JavaClassFile(binaryReader);
+            using BinaryReader binaryReader = new EndianessBinaryReader(File.OpenRead(filePath));
+            JavaClassFile classFile = JavaClassFile.FromBinaryStream(binaryReader);
             Console.Out.WriteLine(classFile);
         }
     }
