@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using JdSharp.JarDecompiler.Attributes;
+using JdSharp.JarDecompiler.ClassFileProperties;
 using JdSharp.JarDecompiler.Constants;
+using JdSharp.JarDecompiler.Enums;
+using JdSharp.JarDecompiler.Extensions;
 
 namespace JdSharp.JarDecompiler.Utils
 {
@@ -26,10 +31,72 @@ namespace JdSharp.JarDecompiler.Utils
             };
         }
 
-        public static string GetValueFromUshort(this BaseConstant[] constants, ushort thisClass)
+        public static AccessFlagEnum[] GetAccessFlagsFromValue(ushort value)
         {
-            ushort nameIndex = ((ClassConstant)constants[thisClass - 1]).NameIndex;
-            return ((Utf8Constant)constants[nameIndex - 1])?.Value;
+            List<AccessFlagEnum> flags = new List<AccessFlagEnum>();
+
+            foreach (AccessFlagEnum accessFlag in Enum.GetValues(typeof(AccessFlagEnum)))
+            {
+                if (((ushort)accessFlag & value) != 0)
+                {
+                    flags.Add(accessFlag);
+                }
+            }
+
+            return flags.ToArray();
+        }
+
+        public static string[] GetInterfaces(uint count, ref BinaryReader reader, BaseConstant[] constants)
+        {
+            string[] interfaces = new string[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                ushort constantIndex = reader.ReadUInt16();
+                interfaces[i] = constants.GetConstantFromUshort(constantIndex);
+            }
+
+            return interfaces;
+        }
+
+        public static Field[] GetFields(ushort count, ref BinaryReader reader, BaseConstant[] constants)
+        {
+            Field[] fields = new Field[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                fields[i] = Field.FromBinaryStream(reader, constants);
+            }
+
+            return fields;
+        }
+
+        public static IDictionary<AttributesEnum, BaseAttribute> GetAttributes(ushort count, ref BinaryReader reader,
+            BaseConstant[] constants)
+        {
+            IDictionary<AttributesEnum, BaseAttribute> attrs = new Dictionary<AttributesEnum, BaseAttribute>();
+
+            for (int i = 0; i < count; i++)
+            {
+                ushort attributeNameIndex = reader.ReadUInt16();
+                uint attributeLenth = reader.ReadUInt32();
+
+                BaseConstant constant = constants[attributeNameIndex - 1];
+
+                if (constant is Utf8Constant utf8Constant)
+                {
+                    string? info = utf8Constant.Value;
+                    
+                    if (!string.IsNullOrEmpty(info))
+                    {
+                        AttributesEnum attributesEnum = Enum.Parse<AttributesEnum>(info);
+                        // TODO: add all enum instances
+                        attrs.Add(attributesEnum, new BaseAttribute());
+                    }
+                }
+            }
+
+            return attrs;
         }
     }
 }

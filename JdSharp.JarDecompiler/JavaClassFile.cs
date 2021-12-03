@@ -1,7 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
+using JdSharp.Core;
+using JdSharp.JarDecompiler.ClassFileProperties;
 using JdSharp.JarDecompiler.Constants;
+using JdSharp.JarDecompiler.Enums;
+using JdSharp.JarDecompiler.Extensions;
 using JdSharp.JarDecompiler.Utils;
 
 namespace JdSharp.JarDecompiler
@@ -15,16 +20,18 @@ namespace JdSharp.JarDecompiler
         private ushort MajorVersion { get; }
         private ushort ConstantPoolCount { get; }
         private BaseConstant[] Constants { get; }
-        private ushort AccessFlags { get; }
+        private AccessFlagEnum[] AccessFlags { get; }
         private ushort ThisClass { get; }
         private ushort SuperClass { get; }
         private string ClassFileName { get; }
         private string ClassFileType { get; }
         private ushort InterfaceCount { get; }
+        private string[]? Interfaces { get; }
+        private ushort FieldCount { get; }
 
         private JavaClassFile(uint magicNumber, ushort minorVersion, ushort majorVersion, ushort constantPoolCount,
-            BaseConstant[] baseConstants, ushort accessFlags, ushort thisClass, ushort superClass, string classFileName,
-            string classFileType, ushort interfaceCount)
+            BaseConstant[] baseConstants, AccessFlagEnum[] accessFlags, ushort thisClass, ushort superClass, string classFileName,
+            string classFileType, ushort interfaceCount, string[]? interfaces, ushort fieldCount)
         {
             MagicNumber = magicNumber;
             MinorVersion = minorVersion;
@@ -37,6 +44,8 @@ namespace JdSharp.JarDecompiler
             ClassFileName = classFileName;
             ClassFileType = classFileType;
             InterfaceCount = interfaceCount;
+            Interfaces = interfaces;
+            FieldCount = fieldCount;
         }
 
         public static JavaClassFile FromBinaryStream(BinaryReader reader)
@@ -57,19 +66,29 @@ namespace JdSharp.JarDecompiler
                 constants[i] = ClassFileUtils.GetConstantType(tag, ref reader);
             }
 
-            ushort accessFlags = reader.ReadUInt16();
+            AccessFlagEnum[] accessFlags = ClassFileUtils.GetAccessFlagsFromValue(reader.ReadUInt16());
 
             ushort thisClass = reader.ReadUInt16();
+            string fileName = constants.GetConstantFromUshort(thisClass);
+            
             ushort superClass = reader.ReadUInt16();
-
-            string fileName = constants.GetValueFromUshort(thisClass);
-            string classType = constants.GetValueFromUshort(superClass);
+            string classType = constants.GetConstantFromUshort(superClass);
 
             ushort interfaceCount = reader.ReadUInt16();
 
+            string[]? interfaces = interfaceCount == 0
+                ? null
+                : ClassFileUtils.GetInterfaces(interfaceCount, ref reader, constants);
+
+            ushort fieldCount = reader.ReadUInt16();
+            Field[]? fields = fieldCount == 0
+                ? null
+                : ClassFileUtils.GetFields(fieldCount, ref reader, constants);
+                
+            
             return new JavaClassFile(magicNumber, minorVersion, majorVersion,
-                constantPoolCount, constants, accessFlags,
-                thisClass, superClass, fileName, classType, interfaceCount);
+                constantPoolCount, constants, accessFlags, thisClass, superClass,
+                fileName, classType, interfaceCount, interfaces, fieldCount);
         }
 
         public override string ToString()
@@ -79,9 +98,16 @@ namespace JdSharp.JarDecompiler
             builder.Append($"Minor Versionn: {MinorVersion}\n");
             builder.Append($"Major Version: {MajorVersion}\n");
             builder.Append($"Constant Count: {ConstantPoolCount}\n");
+            builder.Append($"Access Flags: ");
+            AccessFlags.ToList().ForEach(ac =>
+            {
+                builder.Append(ac.ToStringValue()).Append(' ');
+            });
+            builder.Append('\n');
             builder.Append($"Class File Name: {ClassFileName}\n");
             builder.Append($"Class File Type: {ClassFileType}\n");
             builder.Append($"Interface Count: {InterfaceCount}\n");
+            builder.Append($"Field Count: {FieldCount}\n");
             builder.Append("}\n");
             return builder.ToString();
         }

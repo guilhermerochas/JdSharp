@@ -1,6 +1,6 @@
 ﻿namespace JdSharp.JarDecompiler.Enums
 {
-    public enum AccessFlagEnum: uint
+    public enum AccessFlagEnum: ushort
     {
         AccPublic = 0x0001,
         AccFinal = 0x0010,
