@@ -1,16 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using CommandLine;
-using JdSharp.Core;
+﻿using System.Threading.Tasks;
 
 namespace JdSharp.Cli
 {
     internal static class Program
     {
-        private static async Task Main(string[] args)
-        {
-            Utils.GetDecompilerTypeFromHex("./Hello.class");
-        }
+        private static int Main(string[] args) =>
+            Utils.GetDecompilerTypeFromHex("./SwitchTeste.class");
     }
 }
