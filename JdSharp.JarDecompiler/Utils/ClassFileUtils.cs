@@ -93,23 +93,22 @@ namespace JdSharp.JarDecompiler.Utils
                 uint attributeLenth = reader.ReadUInt32();
                 BaseConstant? constant = constants[attributeNameIndex - 1];
 
-                if (constant is Utf8Constant utf8Constant)
-                {
-                    string? info = utf8Constant.Value;
+                if (constant is not Utf8Constant utf8Constant) continue;
 
-                    if (!string.IsNullOrEmpty(info))
-                    {
-                        AttributesEnum attributesEnum = Enum.Parse<AttributesEnum>(info);
+                string? info = utf8Constant.Value;
 
-                        attrs.Add(attributesEnum, GetAttributeFromEnum(ref reader, attributesEnum, attributeLenth, ref constants));
-                    }
-                }
+                if (string.IsNullOrEmpty(info))
+                    continue;
+
+                AttributesEnum attributesEnum = Enum.Parse<AttributesEnum>(info);
+                attrs.Add(attributesEnum,
+                    GetAttributeFromEnum(ref reader, attributesEnum, attributeLenth, ref constants));
             }
 
             return attrs;
         }
 
-        private static BaseAttribute? GetAttributeFromEnum(ref BinaryReader reader, AttributesEnum attributesEnum,
+        private static BaseAttribute GetAttributeFromEnum(ref BinaryReader reader, AttributesEnum attributesEnum,
             uint attrLenth, ref BaseConstant?[] constants)
         {
             return attributesEnum switch
@@ -121,7 +120,7 @@ namespace JdSharp.JarDecompiler.Utils
                 AttributesEnum.SourceFile => new SourceFileAttribute(
                     Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadUInt16()))),
                 AttributesEnum.StackMapTable => new StackMapTableAttribute(reader.ReadBytes((int)attrLenth)),
-                _ => throw new Exception($"Not able to get attribute with tag: {attributesEnum}")
+                _ => new BaseAttribute(ref reader, attrLenth)
             };
         }
     }

@@ -15,7 +15,7 @@ namespace JdSharp.Cli
                 return 1;
             }
             
-            using BinaryReader binaryReader = new EndianessBinaryReader(File.OpenRead(filePath));
+            using BinaryReader binaryReader = new BigEndianessBinaryReader(File.OpenRead(filePath));
             JavaClassFile classFile = JavaClassFile.FromBinaryStream(binaryReader);
             Console.Out.WriteLine(classFile);
 

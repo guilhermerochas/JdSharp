@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using JdSharp.JarDecompiler.Bytecode;
 using JdSharp.JarDecompiler.Constants;
 using JdSharp.JarDecompiler.Enums;
 using JdSharp.JarDecompiler.Extensions;
@@ -15,16 +14,14 @@ namespace JdSharp.JarDecompiler.ClassFileProperties
         public string Name { get; }
         public string Descriptor { get; }
         public IDictionary<AttributesEnum, BaseAttribute>? Attributes { get; }
-        public List<BytecodeInstruction> Instructions { get; }
 
         private Method(AccessFlagEnum[] accessFlagEnums, string name, string descriptor,
-            IDictionary<AttributesEnum, BaseAttribute>? attributes, List<BytecodeInstruction> instructions)
+            IDictionary<AttributesEnum, BaseAttribute>? attributes)
         {
             AccessFlagEnums = accessFlagEnums;
             Name = name;
             Descriptor = descriptor;
             Attributes = attributes;
-            Instructions = instructions;
         }
 
         public static Method FromBinaryStream(ref BinaryReader reader, BaseConstant?[] constants)
@@ -38,7 +35,7 @@ namespace JdSharp.JarDecompiler.ClassFileProperties
                 ? null
                 : ClassFileUtils.GetAttributes(attributesCount, ref reader, constants);
 
-            return new Method(accessFlagsEnum, name, descriptor, attributes, new List<BytecodeInstruction>());
+            return new Method(accessFlagsEnum, name, descriptor, attributes);
         }
     }
 }

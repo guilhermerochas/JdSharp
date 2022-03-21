@@ -1,7 +1,16 @@
-﻿namespace JdSharp.JarDecompiler.JavaAttributes
+﻿using System.IO;
+
+namespace JdSharp.JarDecompiler.JavaAttributes
 {
-    // TODO: implement sealed for all classes that extend this `BaseAttribute` class
     public class BaseAttribute
     {
+        protected BaseAttribute()
+        {
+        }
+
+        public BaseAttribute(ref BinaryReader reader, uint size)
+        {
+            reader.ReadBytes((int)size);
+        }
     }
 }

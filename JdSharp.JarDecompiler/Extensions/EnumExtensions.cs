@@ -23,14 +23,53 @@ namespace JdSharp.JarDecompiler.Extensions
                 AccessFlagEnum.AccVarargs => "ACC_VARARGS",
                 AccessFlagEnum.AccNative => "ACC_NATIVE",
                 AccessFlagEnum.AccStrict => "ACC_STRICT",
-                _ => throw new ArgumentOutOfRangeException(nameof(accessFlagEnum), accessFlagEnum, "Not able to get string value from AccessFlagEnum")
+                _ => throw new ArgumentOutOfRangeException(nameof(accessFlagEnum), accessFlagEnum,
+                    "Not able to get string value from AccessFlagEnum")
             };
 
-        public static string FasterToString<T>(this T enumValue) where T : Enum
-        {
-            if (enumValue == null) 
-                throw new ArgumentNullException(nameof(enumValue));
-            return nameof(enumValue)!;
-        }
+        public static string ToJavaClass(this AccessFlagEnum accessFlagEnum)
+            => accessFlagEnum switch
+            {
+                AccessFlagEnum.AccAbstract => "abstract",
+                AccessFlagEnum.AccAnnotation => "@",
+                AccessFlagEnum.AccEnum => "enum",
+                AccessFlagEnum.AccPublic => "public",
+                AccessFlagEnum.AccFinal => "final",
+                AccessFlagEnum.AccInterface => "interface",
+                AccessFlagEnum.AccPrivate => "private",
+                AccessFlagEnum.AccProtected => "protected",
+                AccessFlagEnum.AccStatic => "static",
+                AccessFlagEnum.AccNative => "native",
+                _ => string.Empty
+            };
+
+        public static string ToJavaField(this AccessFlagEnum accessFlagEnum)
+            => accessFlagEnum switch
+            {
+                AccessFlagEnum.AccAbstract => "abstract",
+                AccessFlagEnum.AccPublic => "public",
+                AccessFlagEnum.AccFinal => "final",
+                AccessFlagEnum.AccInterface => "interface",
+                AccessFlagEnum.AccPrivate => "private",
+                AccessFlagEnum.AccProtected => "protected",
+                AccessFlagEnum.AccStatic => "static",
+                AccessFlagEnum.AccBridge => "volatile",
+                AccessFlagEnum.AccVarargs => "transient",
+                _ => string.Empty
+            };
+
+        public static string ToJavaMethod(this AccessFlagEnum accessFlagEnum)
+            => accessFlagEnum switch
+            {
+                AccessFlagEnum.AccPublic => "public",
+                AccessFlagEnum.AccProtected => "protected",
+                AccessFlagEnum.AccPrivate => "private",
+                AccessFlagEnum.AccNative => "native",
+                AccessFlagEnum.AccFinal => "final",
+                AccessFlagEnum.AccStatic => "static",
+                AccessFlagEnum.AccSuper => "synchronized",
+                AccessFlagEnum.AccAbstract => "abstract",
+                _ => string.Empty
+            };
     }
 }

@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using JdSharp.Core;
+using JdSharp.JarDecompiler.BufferWriters;
 using JdSharp.JarDecompiler.ClassFileProperties;
 using JdSharp.JarDecompiler.Constants;
 using JdSharp.JarDecompiler.Enums;
@@ -16,7 +16,7 @@ namespace JdSharp.JarDecompiler
 {
     public class JavaClassFile
     {
-        private const uint JavaMagicNumber = 3405691582;
+        public const uint JavaMagicNumber = 3405691582;
 
         public uint MagicNumber { get; }
         public ushort MinorVersion { get; }
@@ -63,6 +63,11 @@ namespace JdSharp.JarDecompiler
             Attributes = attributes;
         }
 
+        public bool IsRecord() => false;
+        public bool IsAnnotation() => AccessFlags.Contains(AccessFlagEnum.AccAnnotation);
+        public bool IsEnum() => AccessFlags.Contains(AccessFlagEnum.AccEnum);
+        public bool IsInterface() => AccessFlags.Contains(AccessFlagEnum.AccInterface);
+        
         public static JavaClassFile FromBinaryStream(BinaryReader reader)
         {
             reader.BaseStream.Position = 0x00;
@@ -134,7 +139,10 @@ namespace JdSharp.JarDecompiler
             builder.Append($"Field Count: {FieldCount}\n");
             builder.Append($"Method Count {MethodCount}\n");
             builder.Append($"Attribute Count {AttributesCount}\n");
-            builder.Append("}\n");
+            builder.Append("}\n\n");
+
+            IBufferWriter<JavaClassFile> bufferWriter = new JavaClassWriter();
+            builder.Append(bufferWriter.Write(this));
 
             return builder.ToString();
         }
