@@ -4,6 +4,6 @@ namespace JdSharp.Core
 {
     public interface IBufferWriter<in TContent>
     {
-        public Stream Write(TContent contet);
+        public byte[] Write(TContent contet);
     }
 }

@@ -142,8 +142,8 @@ namespace JdSharp.JarDecompiler
             builder.Append('}');
 
             IBufferWriter<JavaClassFile> bufferWriter = new JavaClassWriter();
-            using var dataStream = bufferWriter.Write(this);
-            ReaderUtils.ReadLineFromStream(dataStream, (value) => builder.Append(value).Append('\n'));
+            var dataStream = bufferWriter.Write(this);
+            builder.Append(dataStream).Append('\n');
 
             return builder.ToString();
         }

@@ -11,7 +11,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
 
     public class Argument
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public int ArrayDepth { get; set; }
     }
 }

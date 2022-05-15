@@ -14,7 +14,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
         private readonly List<string> _importsList = new();
         private readonly StringBuilder _contentBuilder = new("\n");
         private JavaClassFile _javaClass = null!;
-        private readonly Encoding _encoding = Encoding.UTF8;
+        private readonly Encoding _encoding = Encoding.ASCII;
 
         public const string JavaLangPackageDefinition = "Ljava/lang/";
         public const string ConstructorSpecialMethodName = "<init>";
@@ -35,7 +35,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
                                                 AccessFlagEnum.AccFinal | AccessFlagEnum.AccStatic |
                                                 AccessFlagEnum.AccSuper | AccessFlagEnum.AccAbstract);
 
-        public Stream Write(JavaClassFile content)
+        public byte[] Write(JavaClassFile content)
         {
             _javaClass = content;
 
@@ -43,8 +43,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
             ParseFields();
             ParseMethods();
 
-            return new MemoryStream(
-                _encoding.GetBytes(string.Join("\n", _importsList) + '\n' + _contentBuilder.Append('}')));
+            return _encoding.GetBytes(string.Join("\n", _importsList) + '\n' + _contentBuilder.Append('}'));
         }
 
         private void ParseClassStructure()
@@ -158,6 +157,8 @@ namespace JdSharp.JarDecompiler.BufferWriters
 
             foreach (var method in methods)
             {
+                bool isConstructor = method.Name is ConstructorSpecialMethodName;
+
                 if (method.Name is "<clinit>")
                 {
                     continue;
@@ -182,15 +183,10 @@ namespace JdSharp.JarDecompiler.BufferWriters
                 }
 
                 var methodWriter = ParserUtils.MethodDescriptorToJava(method);
-
-                AppendObjectWithPackage(methodWriter.Type);
+                AppendObjectWithPackage(methodWriter.Type, isConstructor: isConstructor);
 
                 _contentBuilder.Append(string.Concat(Enumerable.Repeat("[]", methodWriter.ArrayDepth)));
-
-                _contentBuilder.Append(' ').Append(method.Name is ConstructorSpecialMethodName
-                    ? _javaClass.ClassFileName
-                    : method.Name);
-
+                _contentBuilder.Append(' ').Append(isConstructor ? _javaClass.ClassFileName : method.Name);
                 _contentBuilder.Append('(');
 
                 for (int i = 0; i < methodWriter.Arguments.Count; i++)
@@ -214,14 +210,15 @@ namespace JdSharp.JarDecompiler.BufferWriters
                 }
                 else
                 {
-                    _contentBuilder.Append("{\n\t\t}");
+                    _contentBuilder.Append("{\n\t}");
                 }
 
                 _contentBuilder.Append("\n\n");
             }
         }
 
-        private void AppendObjectWithPackage(string objectDescription, string originalObject = "")
+        private void AppendObjectWithPackage(string objectDescription, string originalObject = "",
+            bool isConstructor = false)
         {
             var description = string.IsNullOrEmpty(objectDescription) ? originalObject : objectDescription;
 
@@ -241,6 +238,11 @@ namespace JdSharp.JarDecompiler.BufferWriters
             }
             else
             {
+                if (isConstructor && description.StartsWith("void"))
+                {
+                    return;
+                }
+
                 _contentBuilder.Append(description);
             }
         }

@@ -1,6 +1,9 @@
-﻿namespace JdSharp.Core.Extensions;
+﻿using System.IO.Compression;
 
-public class ZipExtensions
+namespace JdSharp.Core.Extensions;
+
+public static class ZipExtensions
 {
-    
+    public static bool IsFolder(this ZipArchiveEntry entry) 
+        => entry.FullName.EndsWith("/");
 }

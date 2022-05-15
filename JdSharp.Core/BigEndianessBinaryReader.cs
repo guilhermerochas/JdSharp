@@ -8,6 +8,7 @@ namespace JdSharp.Core
         public BigEndianessBinaryReader(Stream input) : base(input)
         {
         }
+        
 
         public override short ReadInt16() => BinaryPrimitives.ReadInt16BigEndian(ReadBytes(sizeof(short)));
 

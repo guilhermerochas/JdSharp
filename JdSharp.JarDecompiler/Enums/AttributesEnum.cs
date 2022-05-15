@@ -10,6 +10,7 @@
         EnclosingMethod,
         Synthetic,
         Signature,
+        LocalVariableTable,
         SourceFile,
         SourceDebugExtension,
         LineNumberTable,
