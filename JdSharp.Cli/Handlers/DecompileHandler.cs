@@ -29,44 +29,74 @@ namespace JdSharp.Cli.Handlers
             await console.Output.WriteLineAsync($"found {inputFile}");
             await console.Output.WriteLineAsync($"decompiling...");
 
-            var decompilerResult = decompiler.Decompile(new DecompilerOptions
+            try
             {
-                Console = console.Output,
-                FileSignature = signature,
-                InputFileName = inputFile
-            });
-            
-            if (string.IsNullOrEmpty(outputDir))
-            {
-                outputDir = Environment.CurrentDirectory;
+                var decompilerResult = decompiler.Decompile(new DecompilerOptions
+                {
+                    Console = console.Output,
+                    FileSignature = signature,
+                    InputFileName = inputFile
+                });
+
+                if (string.IsNullOrEmpty(outputDir))
+                {
+                    outputDir = Environment.CurrentDirectory;
+                }
+
+                if (!Directory.Exists(outputDir))
+                {
+                    Directory.CreateDirectory(outputDir);
+                }
+
+                if (decompilerResult.FileContents.Count == 1)
+                {
+                    var fileNameBuilder = new StringBuilder();
+
+                    if (string.IsNullOrEmpty(inputFile))
+                    {
+                        fileNameBuilder.Append(
+                            decompilerResult.FileName.Remove(
+                                decompilerResult.FileName.LastIndexOf(".", StringComparison.Ordinal)));
+                    }
+                    else
+                    {
+                        fileNameBuilder.Append(inputFile);
+                    }
+
+                    fileNameBuilder.Append('.').Append(decompiler.FileExtension());
+
+                    await using StreamWriter fileWriter =
+                        new StreamWriter(Path.Combine(outputDir, fileNameBuilder.ToString()), false, Encoding.ASCII);
+
+                    await fileWriter.BaseStream.WriteAsync(decompilerResult.FileContents[0].Data, 0,
+                        decompilerResult.FileContents[0].Data.Length);
+
+                    return;
+                }
+                else
+                {
+                    await console.Output.WriteLineAsync($"Found {decompilerResult.FileContents.Count} inner files");
+
+                    if (outputDir == Environment.CurrentDirectory)
+                    {
+                        outputDir = Directory.CreateDirectory(inputFile).FullName;
+                    }
+
+                    foreach (var fileContent in decompilerResult.FileContents)
+                    {
+                        await using StreamWriter fileWriter =
+                            new StreamWriter(Path.Combine(outputDir, fileContent.Path), false, Encoding.ASCII);
+
+                        await fileWriter.BaseStream.WriteAsync(fileContent.Data, 0, fileContent.Data.Length);
+                    }
+                }
+
+                await console.Output.WriteLineAsync("File decompiled successfully");
             }
-
-            if (!Directory.Exists(outputDir))
+            catch (Exception exception)
             {
-                Directory.CreateDirectory(outputDir);
+                await console.Error.WriteLineAsync($"Erro: {exception.Message}");
             }
-
-            if (decompilerResult.FileContents.Count == 1)
-            {
-                string fileName =
-                    decompilerResult.FileName.Remove(
-                        decompilerResult.FileName.LastIndexOf(".", StringComparison.Ordinal)) + '.' +
-                    decompiler.FileExtension();
-
-                await using StreamWriter fileWriter = new StreamWriter(Path.Combine(outputDir, fileName), false, Encoding.ASCII);
-                await fileWriter.BaseStream.WriteAsync(decompilerResult.FileContents[0].Data, 0,
-                    decompilerResult.FileContents[0].Data.Length);
-
-                return;
-            }
-            else
-            {
-                await console.Output.WriteLineAsync($"Found {decompilerResult.FileContents.Count} inner files");
-                
-                
-            }
-
-            await console.Output.WriteLineAsync("File decompiled successfully");
         }
     }
 }
