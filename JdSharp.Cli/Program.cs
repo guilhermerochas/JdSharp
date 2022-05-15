@@ -9,6 +9,6 @@ namespace JdSharp.Cli
             await new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
                 .Build()
-                .RunAsync(new [] {"decompile", @"C:\Users\ThinkPad\Desktop\DotNet\JdSharp\JdSharp.Cli\bin\Debug\net5.0\VarState.class"});
+                .RunAsync(args);
     }
 }

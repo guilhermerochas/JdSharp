@@ -13,9 +13,9 @@ namespace JdSharp.Cli.Commands
         public string InputFilePath { get; init; } = string.Empty;
         
         [CommandOption("output", 'o', Description = "Output folder of the generated content")]
-        public string OututDirectory { get; init; } = ".";
+        public string OututDirectory { get; init; } = string.Empty;
 
-        private readonly DecompileHandler _handler = new DecompileHandler();
+        private readonly DecompileHandler _handler = new();
 
         public async ValueTask ExecuteAsync(IConsole console)
             => await _handler.HandleDecompilerAsync(console, InputFilePath, OututDirectory);
