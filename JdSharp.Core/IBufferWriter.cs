@@ -1,7 +1,9 @@
-﻿namespace JdSharp.Core
+﻿using System.IO;
+
+namespace JdSharp.Core
 {
     public interface IBufferWriter<in TContent>
     {
-        public string Write(TContent contet);
+        public Stream Write(TContent contet);
     }
 }

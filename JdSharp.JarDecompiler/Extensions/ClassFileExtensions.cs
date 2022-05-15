@@ -18,22 +18,15 @@ namespace JdSharp.JarDecompiler.Extensions
 
             throw new Exception($"Not able to get Utf8 from index at {value - 1} in constants");
         }
-        
+
         public static string GetUft8ConstantFromUshort(this BaseConstant?[] constants, ushort value)
         {
             string? stringFromUtf8Constant = (constants[value - 1] as Utf8Constant)?.Value;
 
             if (!string.IsNullOrEmpty(stringFromUtf8Constant))
                 return stringFromUtf8Constant;
-            
+
             throw new Exception($"Not able to get Utf8 from index at {value - 1} in constants");
-        }
-        
-        public static NameAndTypeConstant GetNameAndTypeConstantFromUshort(this BaseConstant[] constants, ushort value)
-        {
-            if (constants[value - 1] is NameAndTypeConstant nameAndTypeConstant)
-                return nameAndTypeConstant;
-            throw new Exception($"Not able to get NameAndType from index at {value - 1} in constants");
         }
     }
 }

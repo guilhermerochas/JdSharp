@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using JdSharp.Core;
+using JdSharp.Core.Utils;
 using JdSharp.JarDecompiler.BufferWriters;
 using JdSharp.JarDecompiler.ClassFileProperties;
 using JdSharp.JarDecompiler.Constants;
@@ -67,7 +68,7 @@ namespace JdSharp.JarDecompiler
         public bool IsAnnotation() => AccessFlags.Contains(AccessFlagEnum.AccAnnotation);
         public bool IsEnum() => AccessFlags.Contains(AccessFlagEnum.AccEnum);
         public bool IsInterface() => AccessFlags.Contains(AccessFlagEnum.AccInterface);
-        
+
         public static JavaClassFile FromBinaryStream(BinaryReader reader)
         {
             reader.BaseStream.Position = 0x00;
@@ -135,14 +136,14 @@ namespace JdSharp.JarDecompiler
             builder.Append('\n');
             builder.Append($"Class File Name: {ClassFileName}\n");
             builder.Append($"Class File Type: {ClassFileType}\n");
-            builder.Append($"Interface Count: {InterfaceCount}\n");
             builder.Append($"Field Count: {FieldCount}\n");
             builder.Append($"Method Count {MethodCount}\n");
             builder.Append($"Attribute Count {AttributesCount}\n");
-            builder.Append("}\n\n");
+            builder.Append('}');
 
             IBufferWriter<JavaClassFile> bufferWriter = new JavaClassWriter();
-            builder.Append(bufferWriter.Write(this));
+            using var dataStream = bufferWriter.Write(this);
+            ReaderUtils.ReadLineFromStream(dataStream, (value) => builder.Append(value).Append('\n'));
 
             return builder.ToString();
         }

@@ -70,9 +70,11 @@ namespace JdSharp.JarDecompiler.Utils
                 descriptorIndex++;
                 
                 methodWriter.Arguments.RemoveAt(argumentIndex);
+                
                 while (descriptor[descriptorIndex].Equals('['))
                 {
                     methodWriter.ArrayDepth += 1;
+                    descriptorIndex += 1;
                 }
                 
                 var methodType = FieldDescriptorToJava(descriptor[descriptorIndex..]);

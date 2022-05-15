@@ -30,7 +30,6 @@ namespace JdSharp.JarDecompiler.Extensions
         public static string ToJavaClass(this AccessFlagEnum accessFlagEnum)
             => accessFlagEnum switch
             {
-                AccessFlagEnum.AccAbstract => "abstract",
                 AccessFlagEnum.AccAnnotation => "@",
                 AccessFlagEnum.AccEnum => "enum",
                 AccessFlagEnum.AccPublic => "public",
@@ -40,13 +39,12 @@ namespace JdSharp.JarDecompiler.Extensions
                 AccessFlagEnum.AccProtected => "protected",
                 AccessFlagEnum.AccStatic => "static",
                 AccessFlagEnum.AccNative => "native",
-                _ => string.Empty
+                _ or AccessFlagEnum.AccAbstract => string.Empty
             };
 
         public static string ToJavaField(this AccessFlagEnum accessFlagEnum)
             => accessFlagEnum switch
             {
-                AccessFlagEnum.AccAbstract => "abstract",
                 AccessFlagEnum.AccPublic => "public",
                 AccessFlagEnum.AccFinal => "final",
                 AccessFlagEnum.AccInterface => "interface",
@@ -55,7 +53,7 @@ namespace JdSharp.JarDecompiler.Extensions
                 AccessFlagEnum.AccStatic => "static",
                 AccessFlagEnum.AccBridge => "volatile",
                 AccessFlagEnum.AccVarargs => "transient",
-                _ => string.Empty
+                _ or AccessFlagEnum.AccAbstract => string.Empty
             };
 
         public static string ToJavaMethod(this AccessFlagEnum accessFlagEnum)
@@ -68,8 +66,7 @@ namespace JdSharp.JarDecompiler.Extensions
                 AccessFlagEnum.AccFinal => "final",
                 AccessFlagEnum.AccStatic => "static",
                 AccessFlagEnum.AccSuper => "synchronized",
-                AccessFlagEnum.AccAbstract => "abstract",
-                _ => string.Empty
+                _ or AccessFlagEnum.AccAbstract => string.Empty
             };
     }
 }

@@ -1,15 +1,18 @@
-﻿using System;
-using JdSharp.Core;
+﻿using System.Collections.Generic;
+using JdSharp.Core.Decompilers;
 
 namespace JdSharp.JarDecompiler
 {
-    public class JarDecompiler : IBaseDecompiler
+    public class JarDecompiler : IDecompiler
     {
-        public string FileName { get; set; }
-        public string OutFileName { get; set; }
+        public IEnumerable<byte[]> AllowedFileSignatures { get; } = new List<byte[]>
+        {
+            new byte[] { 0xca, 0xfe, 0xba, 0xbe }
+        };
+
         public bool Decompile()
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 }

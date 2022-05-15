@@ -1,21 +1,11 @@
-﻿using System;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.IO;
-using System.Text;
 
 namespace JdSharp.Core
 {
     public class BigEndianessBinaryReader : BinaryReader
     {
         public BigEndianessBinaryReader(Stream input) : base(input)
-        {
-        }
-
-        public BigEndianessBinaryReader(Stream input, Encoding encoding) : base(input, encoding)
-        {
-        }
-
-        public BigEndianessBinaryReader(Stream input, Encoding encoding, bool leaveOpen) : base(input, encoding, leaveOpen)
         {
         }
 
