@@ -31,7 +31,6 @@ public static class AssemblyUtils
             }
         }
 
-
         foreach (var instance in decompilersInstances)
         {
             if (instance is null)
@@ -51,6 +50,41 @@ public static class AssemblyUtils
         return (null, null);
     }
 
+    public static (IDecompiler?, byte[]? fileSignature) GetDecompilerFromFile(Stream fileInputStream)
+    {
+        byte[] fileSignatue;
+        var decompilerType = typeof(IDecompiler);
+        
+        var implementations = GetAssemblyWithReferences().SelectMany(assembly => assembly.GetTypes())
+            .Where(type => decompilerType.IsAssignableFrom(type) && !type.IsInterface).ToList();
+
+        IEnumerable<IDecompiler?> decompilersInstances =
+            implementations.Select(implementation => Activator.CreateInstance(implementation) as IDecompiler);
+        
+        using (BinaryReader binaryReader = new BigEndianessBinaryReader(fileInputStream))
+        {
+            fileSignatue = binaryReader.ReadBytes(4);
+        }
+        
+        foreach (var instance in decompilersInstances)
+        {
+            if (instance is null)
+            {
+                continue;
+            }
+
+            foreach (var allowedFileSign in instance.AllowedFileSignatures)
+            {
+                if (fileSignatue.SequenceEqual(allowedFileSign))
+                {
+                    return (instance, fileSignatue);
+                }
+            }
+        }
+
+        return (null, null);
+    }
+    
     public static IEnumerable<Assembly> GetAssemblyWithReferences()
     {
         var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();

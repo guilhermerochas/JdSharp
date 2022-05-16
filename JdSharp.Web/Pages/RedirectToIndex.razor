@@ -1,0 +1,8 @@
+﻿@inject NavigationManager _uriHelper
+
+@code {
+    protected override void OnInitialized()
+    {
+        _uriHelper.NavigateTo("decompiler");
+    }
+}

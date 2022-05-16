@@ -84,8 +84,12 @@ namespace JdSharp.Cli.Handlers
 
                     foreach (var fileContent in decompilerResult.FileContents)
                     {
+                        var fileName =
+                            fileContent.Path.Remove(fileContent.Path.LastIndexOf(".", StringComparison.Ordinal)) + '.' +
+                            decompiler.FileExtension();
+
                         await using StreamWriter fileWriter =
-                            new StreamWriter(Path.Combine(outputDir, fileContent.Path), false, Encoding.ASCII);
+                            new StreamWriter(Path.Combine(outputDir, fileName), false, Encoding.ASCII);
 
                         await fileWriter.BaseStream.WriteAsync(fileContent.Data, 0, fileContent.Data.Length);
                     }

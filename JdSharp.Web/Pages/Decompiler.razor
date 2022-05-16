@@ -1,0 +1,79 @@
+﻿@page "/Decompiler"
+@using JdSharp.Core.Utils
+@using JdSharp.Core.Models
+@using System.Text
+@inject IJSRuntime _jsRuntime
+
+<div class="container">
+    <h3>JdSharp Decompiler</h3>
+    <hr class="mt-2 mb-3"/>
+    <div class="d-flex justify-content-between">
+        <InputFile class="custom-file-input" OnChange="@OnFileLoad"></InputFile>
+        <button type="button" class="btn btn-primary" onclick="@ClearContent">Clear</button>
+    </div>
+    <div class="mt-3">
+        <h4>@FileName</h4>
+        <textarea class="form-control" disabled rows="25" >
+            @InputValue
+        </textarea>
+    </div>
+</div>
+
+
+@code {
+    private string? InputValue { get; set; }
+    private string? FileName { get; set; }
+    private readonly Encoding _encoding = Encoding.ASCII; 
+
+    private async Task OnFileLoad(InputFileChangeEventArgs eventArgs)
+    {
+        await using MemoryStream memoryStream = new();
+        await eventArgs.File.OpenReadStream().CopyToAsync(memoryStream);
+        var (decompiler, signature) = AssemblyUtils.GetDecompilerFromFile(memoryStream);
+        
+        if (decompiler is not null)
+        {
+            try
+            {
+                var decompilerResult = decompiler.Decompile(new DecompilerOptions
+                {
+                    Console = Console.Out,
+                    FileSignature = signature,
+                    InputFileName = eventArgs.File.Name
+                });
+        
+                if (decompilerResult.FileContents.Count == 1)
+                {
+                    var fileNameBuilder = new StringBuilder();
+                    fileNameBuilder.Append(
+                        decompilerResult.FileName.Remove(
+                            decompilerResult.FileName.LastIndexOf(".", StringComparison.Ordinal)));
+                    fileNameBuilder.Append('.').Append(decompiler.FileExtension());
+        
+                    FileName = fileNameBuilder.ToString();
+                    InputValue = _encoding.GetString(decompilerResult.FileContents.First().Data);
+                    return;
+                }
+                else
+                {
+                    await _jsRuntime.InvokeVoidAsync("alert", "JdSharp for Web does not support decompilers that return multiple values");
+                }
+            }
+            catch (Exception exception)
+            {
+                await Console.Out.WriteLineAsync(exception.Message);
+            }
+            
+            return;
+        }
+        
+        await _jsRuntime.InvokeVoidAsync("alert", "JdSharp was not able to decompile your input file");
+    }
+
+    private void ClearContent()
+    {
+        InputValue = string.Empty;
+        FileName = string.Empty;
+    }
+
+}
