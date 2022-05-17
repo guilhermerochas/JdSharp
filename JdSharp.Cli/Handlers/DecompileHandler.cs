@@ -31,11 +31,13 @@ namespace JdSharp.Cli.Handlers
 
             try
             {
+                using StreamReader streamReader = new StreamReader(inputFile);
                 var decompilerResult = decompiler.Decompile(new DecompilerOptions
                 {
                     Console = console.Output,
                     FileSignature = signature,
-                    InputFileName = inputFile
+                    InputFileStream = streamReader.BaseStream,
+                    FileName = inputFile
                 });
 
                 if (string.IsNullOrEmpty(outputDir))

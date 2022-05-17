@@ -6,5 +6,6 @@ public class DecompilerOptions
 {
     public TextWriter Console { get; set; }
     public byte[] FileSignature { get; set; }
-    public string InputFileName { get; set; }
+    public Stream InputFileStream { get; set; }
+    public string FileName { get; set; }
 }

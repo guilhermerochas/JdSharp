@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,67 +11,40 @@ namespace JdSharp.Core.Utils;
 
 public static class AssemblyUtils
 {
-    public static (IDecompiler?, byte[]? fileSignature) GetDecompilerFromFile(string inputFile)
+    public static (IDecompiler?, byte[]? fileSignature) GetDecompilerFromFile(string inputFile,
+        IEnumerable<Assembly>? assemblies = null)
     {
-        byte[] fileSignatue;
         var decompilerType = typeof(IDecompiler);
 
-        var implementations = GetAssemblyWithReferences().SelectMany(assembly => assembly.GetTypes())
+        assemblies ??= GetAssemblyWithReferences();
+
+        var implementations = assemblies.SelectMany(assembly => assembly.GetTypes())
             .Where(type => decompilerType.IsAssignableFrom(type) && !type.IsInterface).ToList();
 
         IEnumerable<IDecompiler?> decompilersInstances =
             implementations.Select(implementation => Activator.CreateInstance(implementation) as IDecompiler);
 
-        using (StreamReader streamReader = new StreamReader(inputFile))
-        {
-            using (BinaryReader binaryReader = new BigEndianessBinaryReader(streamReader.BaseStream))
-            {
-                fileSignatue = binaryReader.ReadBytes(4);
-            }
-        }
-
-        foreach (var instance in decompilersInstances)
-        {
-            if (instance is null)
-            {
-                continue;
-            }
-
-            foreach (var allowedFileSign in instance.AllowedFileSignatures)
-            {
-                if (fileSignatue.SequenceEqual(allowedFileSign))
-                {
-                    return (instance, fileSignatue);
-                }
-            }
-        }
-
-        return (null, null);
+        using StreamReader streamReader = new StreamReader(inputFile);
+        
+        return GetDecompilerFromStream(streamReader.BaseStream, decompilersInstances);
     }
 
-    public static (IDecompiler?, byte[]? fileSignature) GetDecompilerFromFile(Stream fileInputStream)
+    public static (IDecompiler?, byte[]? fileSignature) GetDecompilerFromStream(Stream fileInputStream, IEnumerable<IDecompiler?> decompilersInstances)
     {
         byte[] fileSignatue;
-        var decompilerType = typeof(IDecompiler);
-        
-        var implementations = GetAssemblyWithReferences().SelectMany(assembly => assembly.GetTypes())
-            .Where(type => decompilerType.IsAssignableFrom(type) && !type.IsInterface).ToList();
-
-        IEnumerable<IDecompiler?> decompilersInstances =
-            implementations.Select(implementation => Activator.CreateInstance(implementation) as IDecompiler);
         
         using (BinaryReader binaryReader = new BigEndianessBinaryReader(fileInputStream))
         {
             fileSignatue = binaryReader.ReadBytes(4);
         }
-        
+
         foreach (var instance in decompilersInstances)
         {
             if (instance is null)
             {
                 continue;
             }
-
+            
             foreach (var allowedFileSign in instance.AllowedFileSignatures)
             {
                 if (fileSignatue.SequenceEqual(allowedFileSign))
@@ -84,7 +56,7 @@ public static class AssemblyUtils
 
         return (null, null);
     }
-    
+
     public static IEnumerable<Assembly> GetAssemblyWithReferences()
     {
         var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();

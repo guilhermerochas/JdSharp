@@ -1,0 +1,24 @@
+﻿@page "/Plugins"
+@using JdSharp.Core.Decompilers
+
+<div class="container">
+    <h2>Plugins Available:</h2>
+    <hr class="mt-2 mb-3"/>
+    <ul class="list-group list-group-light">
+        @foreach (IDecompiler decompiler in Decompilers)
+        {
+            <li class="list-group-item">
+                @decompiler.GetType().GetImplementingClass(typeof(IDecompiler)).Name
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    public IEnumerable<IDecompiler> Decompilers { get; private set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Decompilers = _decompilerService.GetDecompilers();
+    }
+}

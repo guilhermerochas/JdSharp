@@ -29,22 +29,20 @@ namespace JdSharp.JarDecompiler
 
             if (IsJavaClassFile(options.FileSignature))
             {
-                using StreamReader fileReader = new StreamReader(options.InputFileName);
-                using BinaryReader binaryReader = new BigEndianessBinaryReader(fileReader.BaseStream);
+                using BinaryReader binaryReader = new BigEndianessBinaryReader(options.InputFileStream);
                 
                 JavaClassFile javaClassFile = JavaClassFile.FromBinaryStream(binaryReader);
 
                 var buffer = new JavaClassWriter().Write(javaClassFile);
                 fileResults.Add(new FileResult
                 {
-                    Path = options.InputFileName,
+                    Path = options.FileName,
                     Data = buffer
                 });
             }
             else
             {
-                using StreamReader zipReader = new StreamReader(options.InputFileName);
-                using var unziper = new ZipArchive(zipReader.BaseStream, ZipArchiveMode.Read);
+                using var unziper = new ZipArchive(options.InputFileStream, ZipArchiveMode.Read);
 
                 foreach (var entry in unziper.Entries.Where(entry => !entry.IsFolder()))
                 {
@@ -75,7 +73,7 @@ namespace JdSharp.JarDecompiler
             return new DecompilerResult
             {
                 FileContents = fileResults,
-                FileName = Path.GetFileName(options.InputFileName)
+                FileName = Path.GetFileName(options.FileName)
             };
         }
     }
