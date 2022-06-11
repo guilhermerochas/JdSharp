@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using JdSharp.Core.Models;
+﻿using JdSharp.Core.Models;
+using System.Collections.Generic;
 
 namespace JdSharp.Core.Decompilers
 {

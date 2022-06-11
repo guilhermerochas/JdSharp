@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using JdSharp.Core;
-using JdSharp.Core.Utils;
+﻿using JdSharp.Core;
 using JdSharp.JarDecompiler.BufferWriters;
 using JdSharp.JarDecompiler.ClassFileProperties;
 using JdSharp.JarDecompiler.Constants;
@@ -12,6 +6,11 @@ using JdSharp.JarDecompiler.Enums;
 using JdSharp.JarDecompiler.Extensions;
 using JdSharp.JarDecompiler.JavaAttributes;
 using JdSharp.JarDecompiler.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace JdSharp.JarDecompiler
 {
@@ -86,9 +85,9 @@ namespace JdSharp.JarDecompiler
                 uint tag = reader.ReadByte();
                 constants[i] = ClassFileUtils.GetConstantType(tag, ref reader);
 
-                if (tag == 6)
+                if (tag is 6)
                 {
-                    i += 1;
+                    i++;
                     constants[i] = null;
                 }
             }
@@ -127,22 +126,22 @@ namespace JdSharp.JarDecompiler
         public override string ToString()
         {
             StringBuilder builder = new("ClassFile {\n");
-            builder.Append($"Magic Number: {MagicNumber}\n");
-            builder.Append($"Minor Versionn: {MinorVersion}\n");
-            builder.Append($"Major Version: {MajorVersion}\n");
-            builder.Append($"Constant Count: {ConstantPoolCount}\n");
-            builder.Append($"Access Flags: ");
-            AccessFlags.ToList().ForEach(ac => { builder.Append(ac.ToStringValue()).Append(' '); });
+            builder.Append("Magic Number: ").Append(MagicNumber).Append('\n');
+            builder.Append("Minor Versionn: ").Append(MinorVersion).Append('\n');
+            builder.Append("Major Version: ").Append(MajorVersion).Append('\n');
+            builder.Append("Constant Count: ").Append(ConstantPoolCount).Append('\n');
+            builder.Append("Access Flags: ");
+            AccessFlags.ToList().ForEach(ac => builder.Append(ac.ToStringValue()).Append(' '));
             builder.Append('\n');
-            builder.Append($"Class File Name: {ClassFileName}\n");
-            builder.Append($"Class File Type: {ClassFileType}\n");
-            builder.Append($"Field Count: {FieldCount}\n");
-            builder.Append($"Method Count {MethodCount}\n");
-            builder.Append($"Attribute Count {AttributesCount}\n");
+            builder.Append("Class File Name: ").Append(ClassFileName).Append('\n');
+            builder.Append("Class File Type: ").Append(ClassFileType).Append('\n');
+            builder.Append("Field Count: ").Append(FieldCount).Append('\n');
+            builder.Append("Method Count ").Append(MethodCount).Append('\n');
+            builder.Append("Attribute Count ").Append(AttributesCount).Append('\n');
             builder.Append('}');
 
             IBufferWriter<JavaClassFile> bufferWriter = new JavaClassWriter();
-            var dataStream = bufferWriter.Write(this);
+            byte[]? dataStream = bufferWriter.Write(this);
             builder.Append(dataStream).Append('\n');
 
             return builder.ToString();

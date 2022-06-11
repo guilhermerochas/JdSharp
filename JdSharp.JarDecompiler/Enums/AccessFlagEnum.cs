@@ -3,7 +3,7 @@
 namespace JdSharp.JarDecompiler.Enums
 {
     [Flags]
-    public enum AccessFlagEnum: ushort
+    public enum AccessFlagEnum : ushort
     {
         AccPublic = 0x0001,
         AccPrivate = 0x0002,
@@ -17,7 +17,7 @@ namespace JdSharp.JarDecompiler.Enums
         AccInterface = 0x0200,
         AccAbstract = 0x0400,
         AccStrict = 0x0800,
-        AccSynthetic = 0x1000, 
+        AccSynthetic = 0x1000,
         AccAnnotation = 0x2000,
         AccEnum = 0x4000
     }

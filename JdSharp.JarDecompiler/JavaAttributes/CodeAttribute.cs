@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using JdSharp.JarDecompiler.ClassFileProperties;
+﻿using JdSharp.JarDecompiler.ClassFileProperties;
 using JdSharp.JarDecompiler.Constants;
 using JdSharp.JarDecompiler.Enums;
 using JdSharp.JarDecompiler.Utils;
+using System.Collections.Generic;
+using System.IO;
 
 namespace JdSharp.JarDecompiler.JavaAttributes
 {
@@ -33,7 +33,7 @@ namespace JdSharp.JarDecompiler.JavaAttributes
 
             uint codeLenth = reader.ReadUInt32();
             byte[] code = new byte[codeLenth];
-                
+
             reader.ReadBytes((int)codeLenth).CopyTo(code, 0);
 
             ushort exTableLenth = reader.ReadUInt16();

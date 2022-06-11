@@ -1,10 +1,10 @@
-﻿using System;
+﻿using CliFx.Infrastructure;
+using JdSharp.Core.Models;
+using JdSharp.Core.Utils;
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using CliFx.Infrastructure;
-using JdSharp.Core.Models;
-using JdSharp.Core.Utils;
 
 namespace JdSharp.Cli.Handlers
 {
@@ -18,7 +18,7 @@ namespace JdSharp.Cli.Handlers
                 return;
             }
 
-            var (decompiler, signature) = AssemblyUtils.GetDecompilerFromFile(inputFile);
+            (Core.Decompilers.IDecompiler? decompiler, byte[]? signature) = AssemblyUtils.GetDecompilerFromFile(inputFile);
 
             if (decompiler is null)
             {
@@ -32,7 +32,7 @@ namespace JdSharp.Cli.Handlers
             try
             {
                 using StreamReader streamReader = new StreamReader(inputFile);
-                var decompilerResult = decompiler.Decompile(new DecompilerOptions
+                DecompilerResult? decompilerResult = decompiler.Decompile(new DecompilerOptions
                 {
                     Console = console.Output,
                     FileSignature = signature,
@@ -52,7 +52,7 @@ namespace JdSharp.Cli.Handlers
 
                 if (decompilerResult.FileContents.Count == 1)
                 {
-                    var fileNameBuilder = new StringBuilder();
+                    StringBuilder? fileNameBuilder = new StringBuilder();
 
                     if (string.IsNullOrEmpty(inputFile))
                     {
@@ -84,9 +84,9 @@ namespace JdSharp.Cli.Handlers
                         outputDir = Directory.CreateDirectory(inputFile).FullName;
                     }
 
-                    foreach (var fileContent in decompilerResult.FileContents)
+                    foreach (FileResult? fileContent in decompilerResult.FileContents)
                     {
-                        var fileName =
+                        string? fileName =
                             fileContent.Path.Remove(fileContent.Path.LastIndexOf(".", StringComparison.Ordinal)) + '.' +
                             decompiler.FileExtension();
 

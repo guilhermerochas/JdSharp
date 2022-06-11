@@ -18,7 +18,7 @@ namespace JdSharp.Core.Utils
 
                 while ((line = streamReader.ReadLine()) != null)
                 {
-                    var action = readLinePredicate.Compile();
+                    Action<string>? action = readLinePredicate.Compile();
                     action.Invoke(line);
                 }
             }

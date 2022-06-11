@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using JdSharp.Core.Decompilers;
+﻿using JdSharp.Core.Decompilers;
 
 namespace JdSharp.Web.Services.Decompiler;
 

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using JdSharp.JarDecompiler.Constants;
+﻿using JdSharp.JarDecompiler.Constants;
 using JdSharp.JarDecompiler.Enums;
 using JdSharp.JarDecompiler.Extensions;
 using JdSharp.JarDecompiler.JavaAttributes;
 using JdSharp.JarDecompiler.Utils;
+using System.Collections.Generic;
+using System.IO;
 
 namespace JdSharp.JarDecompiler.ClassFileProperties
 {
@@ -30,11 +30,11 @@ namespace JdSharp.JarDecompiler.ClassFileProperties
             string name = constants.GetUft8ConstantFromUshort(reader.ReadUInt16());
             string descriptor = constants.GetUft8ConstantFromUshort(reader.ReadUInt16());
             ushort attributesCount = reader.ReadUInt16();
-            
+
             IDictionary<AttributesEnum, BaseAttribute>? attributes = attributesCount == 0
                 ? null
                 : ClassFileUtils.GetAttributes(attributesCount, ref reader, constants);
-            
+
             return new Field(accessFlagEnums, name, descriptor, attributes);
         }
     }

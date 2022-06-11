@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using JdSharp.Core;
+﻿using JdSharp.Core;
 using JdSharp.JarDecompiler.Enums;
 using JdSharp.JarDecompiler.Extensions;
 using JdSharp.JarDecompiler.Utils;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace JdSharp.JarDecompiler.BufferWriters
 {
@@ -48,8 +47,8 @@ namespace JdSharp.JarDecompiler.BufferWriters
 
         private void ParseClassStructure()
         {
-            var accessFlagEnums = _javaClass.AccessFlags.OrderBy(flags => (int)flags);
-            foreach (var flag in accessFlagEnums)
+            IOrderedEnumerable<AccessFlagEnum>? accessFlagEnums = _javaClass.AccessFlags.OrderBy(flags => (int)flags);
+            foreach (AccessFlagEnum flag in accessFlagEnums)
             {
                 if (((int)flag & ClassAllowed) != 0)
                 {
@@ -91,14 +90,14 @@ namespace JdSharp.JarDecompiler.BufferWriters
 
         private void ParseFields()
         {
-            var fields = _javaClass.Fields;
+            ClassFileProperties.Field[]? fields = _javaClass.Fields;
 
             if (fields is null)
                 return;
 
             bool isEnum = _javaClass.IsEnum();
 
-            foreach (var field in fields)
+            foreach (ClassFileProperties.Field? field in fields)
             {
                 _contentBuilder.Append('\t');
 
@@ -113,7 +112,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
                     continue;
                 }
 
-                var flags = field.AccessFlags.OrderBy(flag => (int)flag);
+                IOrderedEnumerable<AccessFlagEnum>? flags = field.AccessFlags.OrderBy(flag => (int)flag);
                 foreach (AccessFlagEnum flag in flags)
                 {
                     if (((int)flag & FieldAllowed) != 0)
@@ -145,7 +144,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
 
         private void ParseMethods()
         {
-            var methods = _javaClass.Methods;
+            ClassFileProperties.Method[]? methods = _javaClass.Methods;
 
             if (methods is null)
                 return;
@@ -155,7 +154,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
             if (isEnum)
                 return;
 
-            foreach (var method in methods)
+            foreach (ClassFileProperties.Method? method in methods)
             {
                 bool isConstructor = method.Name is ConstructorSpecialMethodName;
 
@@ -165,7 +164,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
                 }
 
                 _contentBuilder.Append('\t');
-                var flags = method.AccessFlagEnums.OrderBy(flag => (int)flag);
+                IOrderedEnumerable<AccessFlagEnum>? flags = method.AccessFlagEnums.OrderBy(flag => (int)flag);
 
                 foreach (AccessFlagEnum flag in flags)
                 {
@@ -182,7 +181,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
                     }
                 }
 
-                var methodWriter = ParserUtils.MethodDescriptorToJava(method);
+                MethodWriter? methodWriter = ParserUtils.MethodDescriptorToJava(method);
                 AppendObjectWithPackage(methodWriter.Type, isConstructor: isConstructor);
 
                 _contentBuilder.Append(string.Concat(Enumerable.Repeat("[]", methodWriter.ArrayDepth)));
@@ -220,7 +219,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
         private void AppendObjectWithPackage(string objectDescription, string originalObject = "",
             bool isConstructor = false)
         {
-            var description = string.IsNullOrEmpty(objectDescription) ? originalObject : objectDescription;
+            string? description = string.IsNullOrEmpty(objectDescription) ? originalObject : objectDescription;
 
             if (description.StartsWith('L'))
             {

@@ -20,8 +20,8 @@ namespace JdSharp.JarDecompiler.ClassFileProperties
         public static ExceptionTable FromBinaryStream(ref BinaryReader reader)
         {
             return new ExceptionTable(
-                reader.ReadUInt16(), 
-                reader.ReadUInt16(), 
+                reader.ReadUInt16(),
+                reader.ReadUInt16(),
                 reader.ReadUInt16(),
                 reader.ReadUInt16());
         }

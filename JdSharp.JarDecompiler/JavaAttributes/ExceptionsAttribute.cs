@@ -1,6 +1,6 @@
-﻿using System.IO;
-using JdSharp.JarDecompiler.Constants;
+﻿using JdSharp.JarDecompiler.Constants;
 using JdSharp.JarDecompiler.Extensions;
+using System.IO;
 
 namespace JdSharp.JarDecompiler.JavaAttributes
 {
@@ -12,7 +12,7 @@ namespace JdSharp.JarDecompiler.JavaAttributes
         {
             ExceptionIndexTable = exceptionIndexTable;
         }
-        
+
         public static ExceptionsAttribute FromBinaryStream(ref BinaryReader reader, BaseConstant[] constants)
         {
             ushort exceptionCount = reader.ReadUInt16();

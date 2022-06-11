@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using CliFx;
+﻿using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 using JdSharp.Cli.Handlers;
+using System.Threading.Tasks;
 
 namespace JdSharp.Cli.Commands
 {
@@ -18,9 +18,9 @@ namespace JdSharp.Cli.Commands
         [CommandOption("directory", 'd', Description = "Output folder of the generated content")]
         public string OututDirectory { get; init; } = string.Empty;
 
-        private readonly DecompileHandler _handler = new();
+        private readonly DecompileHandler _decompileHandler = new();
 
         public async ValueTask ExecuteAsync(IConsole console)
-            => await _handler.HandleDecompilerAsync(console, InputFilePath, OututFileName, OututDirectory);
+            => await _decompileHandler.HandleDecompilerAsync(console, InputFilePath, OututFileName, OututDirectory);
     }
 }

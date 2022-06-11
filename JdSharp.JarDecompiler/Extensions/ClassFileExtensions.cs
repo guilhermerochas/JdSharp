@@ -1,5 +1,5 @@
-﻿using System;
-using JdSharp.JarDecompiler.Constants;
+﻿using JdSharp.JarDecompiler.Constants;
+using System;
 
 namespace JdSharp.JarDecompiler.Extensions
 {
@@ -11,7 +11,7 @@ namespace JdSharp.JarDecompiler.Extensions
             if (nameIndex != null)
             {
                 string? valueFromUshort = (constants[nameIndex.Value - 1] as Utf8Constant)?.Value;
-            
+
                 if (!string.IsNullOrEmpty(valueFromUshort))
                     return valueFromUshort;
             }

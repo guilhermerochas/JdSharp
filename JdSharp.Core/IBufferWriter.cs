@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace JdSharp.Core
+﻿namespace JdSharp.Core
 {
     public interface IBufferWriter<in TContent>
     {

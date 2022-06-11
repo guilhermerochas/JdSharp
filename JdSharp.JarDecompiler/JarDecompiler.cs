@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using JdSharp.Core;
+﻿using JdSharp.Core;
 using JdSharp.Core.Decompilers;
 using JdSharp.Core.Extensions;
 using JdSharp.Core.Models;
 using JdSharp.JarDecompiler.BufferWriters;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 
 namespace JdSharp.JarDecompiler
 {
@@ -30,10 +30,10 @@ namespace JdSharp.JarDecompiler
             if (IsJavaClassFile(options.FileSignature))
             {
                 using BinaryReader binaryReader = new BigEndianessBinaryReader(options.InputFileStream);
-                
+
                 JavaClassFile javaClassFile = JavaClassFile.FromBinaryStream(binaryReader);
 
-                var buffer = new JavaClassWriter().Write(javaClassFile);
+                byte[]? buffer = new JavaClassWriter().Write(javaClassFile);
                 fileResults.Add(new FileResult
                 {
                     Path = options.FileName,
@@ -42,9 +42,9 @@ namespace JdSharp.JarDecompiler
             }
             else
             {
-                using var unziper = new ZipArchive(options.InputFileStream, ZipArchiveMode.Read);
+                using ZipArchive? unziper = new ZipArchive(options.InputFileStream, ZipArchiveMode.Read);
 
-                foreach (var entry in unziper.Entries.Where(entry => !entry.IsFolder()))
+                foreach (ZipArchiveEntry? entry in unziper.Entries.Where(entry => !entry.IsFolder()))
                 {
                     using MemoryStream memoryStream = new MemoryStream();
                     options.Console.WriteLine(entry.Name);
@@ -52,7 +52,7 @@ namespace JdSharp.JarDecompiler
 
                     using BinaryReader binaryReader = new BigEndianessBinaryReader(memoryStream);
                     binaryReader.BaseStream.Position = 0x00;
-                    var fileSignature = binaryReader.ReadBytes(4);
+                    byte[]? fileSignature = binaryReader.ReadBytes(4);
 
                     if (!IsJavaClassFile(fileSignature))
                     {
@@ -61,7 +61,7 @@ namespace JdSharp.JarDecompiler
 
                     JavaClassFile javaClassFile = JavaClassFile.FromBinaryStream(binaryReader);
 
-                    var buffer = new JavaClassWriter().Write(javaClassFile);
+                    byte[]? buffer = new JavaClassWriter().Write(javaClassFile);
                     fileResults.Add(new FileResult
                     {
                         Path = entry.Name,

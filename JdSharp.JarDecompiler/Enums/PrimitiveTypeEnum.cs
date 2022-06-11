@@ -1,6 +1,6 @@
 ﻿namespace JdSharp.JarDecompiler.Enums
 {
-    public enum PrimitiveTypeEnum 
+    public enum PrimitiveTypeEnum
     {
         Int,
         Byte,

@@ -6,7 +6,7 @@ namespace JdSharp.JarDecompiler.Constants
     {
         public string? Value { get; }
 
-        public Utf8Constant(string? value) : base((uint) ConstantEnum.Utf8)
+        public Utf8Constant(string? value) : base((uint)ConstantEnum.Utf8)
         {
             Value = value;
         }

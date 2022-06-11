@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using JdSharp.JarDecompiler.BufferWriters;
+﻿using JdSharp.JarDecompiler.BufferWriters;
 using JdSharp.JarDecompiler.ClassFileProperties;
+using System.Collections.Generic;
+using System.Text;
 
 namespace JdSharp.JarDecompiler.Utils
 {
@@ -25,17 +25,17 @@ namespace JdSharp.JarDecompiler.Utils
 
         public static MethodWriter MethodDescriptorToJava(Method method)
         {
-            var methodWriter = new MethodWriter
+            MethodWriter? methodWriter = new MethodWriter
             {
                 Arguments = new List<Argument>
                 {
                     new()
                 }
             };
-            var descriptor = method.Descriptor;
+            string? descriptor = method.Descriptor;
 
-            var descriptorIndex = 0;
-            var argumentIndex = 0;
+            int descriptorIndex = 0;
+            int argumentIndex = 0;
 
             if (descriptor[descriptorIndex].Equals('('))
             {
@@ -49,17 +49,17 @@ namespace JdSharp.JarDecompiler.Utils
                             methodWriter.Arguments[argumentIndex].ArrayDepth += 1;
                             break;
                         case ';':
-                        {
-                            var type = typeBuilder.ToString();
-                        
-                            var argumentType = FieldDescriptorToJava(type);
+                            {
+                                string? type = typeBuilder.ToString();
 
-                            methodWriter.Arguments[argumentIndex].Name = string.IsNullOrEmpty(argumentType) ? type : argumentType;
+                                string? argumentType = FieldDescriptorToJava(type);
 
-                            methodWriter.Arguments.Add(new Argument());
-                            argumentIndex += 1;
-                            break;
-                        }
+                                methodWriter.Arguments[argumentIndex].Name = string.IsNullOrEmpty(argumentType) ? type : argumentType;
+
+                                methodWriter.Arguments.Add(new Argument());
+                                argumentIndex += 1;
+                                break;
+                            }
                         default:
                             typeBuilder.Append(descriptor[descriptorIndex]);
                             break;
@@ -68,19 +68,19 @@ namespace JdSharp.JarDecompiler.Utils
                     descriptorIndex++;
                 }
                 descriptorIndex++;
-                
+
                 methodWriter.Arguments.RemoveAt(argumentIndex);
-                
+
                 while (descriptor[descriptorIndex].Equals('['))
                 {
                     methodWriter.ArrayDepth += 1;
                     descriptorIndex += 1;
                 }
-                
-                var methodType = FieldDescriptorToJava(descriptor[descriptorIndex..]);
+
+                string? methodType = FieldDescriptorToJava(descriptor[descriptorIndex..]);
                 methodWriter.Type = string.IsNullOrEmpty(methodType) ? descriptor[descriptorIndex..] : methodType;
             }
-            
+
             return methodWriter;
         }
     }

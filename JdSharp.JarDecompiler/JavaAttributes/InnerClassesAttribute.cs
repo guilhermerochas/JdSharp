@@ -1,6 +1,6 @@
-﻿using System.IO;
-using JdSharp.JarDecompiler.ClassFileProperties;
+﻿using JdSharp.JarDecompiler.ClassFileProperties;
 using JdSharp.JarDecompiler.Constants;
+using System.IO;
 
 namespace JdSharp.JarDecompiler.JavaAttributes
 {

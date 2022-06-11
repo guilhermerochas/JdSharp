@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using JdSharp.JarDecompiler.ClassFileProperties;
+﻿using JdSharp.JarDecompiler.ClassFileProperties;
 using JdSharp.JarDecompiler.Constants;
 using JdSharp.JarDecompiler.Enums;
 using JdSharp.JarDecompiler.Extensions;
 using JdSharp.JarDecompiler.JavaAttributes;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 namespace JdSharp.JarDecompiler.Utils
 {

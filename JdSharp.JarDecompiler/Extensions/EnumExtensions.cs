@@ -1,5 +1,5 @@
-﻿using System;
-using JdSharp.JarDecompiler.Enums;
+﻿using JdSharp.JarDecompiler.Enums;
+using System;
 
 namespace JdSharp.JarDecompiler.Extensions
 {

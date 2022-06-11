@@ -1,8 +1,8 @@
+using JdSharp.Web;
+using JdSharp.Web.Services.Decompiler;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
-using JdSharp.Web;
-using JdSharp.Web.Services.Decompiler;
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

@@ -1,8 +1,8 @@
-﻿using System.IO;
-using JdSharp.JarDecompiler.Constants;
+﻿using JdSharp.JarDecompiler.Constants;
 using JdSharp.JarDecompiler.Enums;
 using JdSharp.JarDecompiler.Extensions;
 using JdSharp.JarDecompiler.Utils;
+using System.IO;
 
 namespace JdSharp.JarDecompiler.ClassFileProperties
 {
@@ -27,7 +27,7 @@ namespace JdSharp.JarDecompiler.ClassFileProperties
             string outerClassInfo = constants.GetConstantFromUshort(reader.ReadUInt16());
             string innerName = constants.GetUft8ConstantFromUshort(reader.ReadUInt16());
             AccessFlagEnum[] innerClassAccess = ClassFileUtils.GetAccessFlagsFromValue(reader.ReadUInt16());
-            
+
             return new Class(innerClassInfo, outerClassInfo, innerName, innerClassAccess);
         }
     }
