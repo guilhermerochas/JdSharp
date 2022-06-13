@@ -3,24 +3,25 @@ using JdSharp.Core.Decompilers;
 using JdSharp.Core.Utils;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using JdSharp.Cli.Commands;
+using JdSharp.Cli.Interfaces;
 
 namespace JdSharp.Cli.Handlers;
 
-public class ListHandler
+public class ListHandler : IHandler<ListCommand>
 {
-    public async Task GetList(IConsole console)
+    private readonly Type _decompilerType = typeof(IDecompiler);
+
+    public async Task Handle(ListCommand command, IConsole console)
     {
         await console.Output.WriteLineAsync("Plugins: ");
 
-        foreach (Type decompiler in
-            AssemblyUtils.GetAssemblyWithReferences().SelectMany(assemly => assemly.GetTypes())
-            .Where(type => typeof(IDecompiler).IsAssignableFrom(type) && !type.IsInterface))
+        foreach (var decompilerType in AssemblyUtils.GetAssemblyWithReferences().SelectMany(asm => asm.GetTypes())
+                     .Where(type => _decompilerType.IsAssignableFrom(type) && !type.IsInterface))
         {
-            if (decompiler is not null)
-            {
-                await console.Output.WriteLineAsync($" - {decompiler.Name}");
-            }
+            await console.Output.WriteLineAsync($" - {decompilerType.Name}");
         }
     }
 }

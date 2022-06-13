@@ -3,13 +3,20 @@ using CliFx.Attributes;
 using CliFx.Infrastructure;
 using JdSharp.Cli.Handlers;
 using System.Threading.Tasks;
+using JdSharp.Cli.Interfaces;
 
 namespace JdSharp.Cli.Commands;
 
 [Command("list")]
 public class ListCommand : ICommand
 {
-    private readonly ListHandler _listHandler = new();
+    private readonly IHandler<ListCommand> _handler;
 
-    public async ValueTask ExecuteAsync(IConsole console) => await _listHandler.GetList(console);
+    public ListCommand()
+    {
+        _handler = new ListHandler();
+    }
+
+    public async ValueTask ExecuteAsync(IConsole console) =>
+        await _handler.Handle(this, console);
 }

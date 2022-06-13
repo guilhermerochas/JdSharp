@@ -3,22 +3,26 @@ using JdSharp.Core.Models;
 using JdSharp.Core.Utils;
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JdSharp.Cli.Commands;
+using JdSharp.Cli.Interfaces;
 
 namespace JdSharp.Cli.Handlers
 {
-    public class DecompileHandler
+    public class DecompileHandler : IHandler<DecompileCommand>
     {
-        public async Task HandleDecompilerAsync(IConsole console, string inputFile, string outputFile, string outputDir)
+        public async Task Handle(DecompileCommand command, IConsole console)
         {
-            if (!File.Exists(inputFile))
+            if (!File.Exists(command.InputFilePath))
             {
-                await console.Error.WriteLineAsync($"file {inputFile} not found");
+                await console.Error.WriteLineAsync($"file {command.InputFilePath} not found");
                 return;
             }
 
-            (Core.Decompilers.IDecompiler? decompiler, byte[]? signature) = AssemblyUtils.GetDecompilerFromFile(inputFile);
+            (Core.Decompilers.IDecompiler? decompiler, byte[]? signature) =
+                AssemblyUtils.GetDecompilerFromFile(command.InputFilePath);
 
             if (decompiler is null)
             {
@@ -26,75 +30,87 @@ namespace JdSharp.Cli.Handlers
                 return;
             }
 
-            await console.Output.WriteLineAsync($"found {inputFile}");
+            await console.Output.WriteLineAsync($"found {command.InputFilePath}");
             await console.Output.WriteLineAsync($"decompiling...");
 
             try
             {
-                using StreamReader streamReader = new StreamReader(inputFile);
+                using StreamReader streamReader = new StreamReader(command.InputFilePath);
                 DecompilerResult? decompilerResult = decompiler.Decompile(new DecompilerOptions
                 {
                     Console = console.Output,
                     FileSignature = signature,
                     InputFileStream = streamReader.BaseStream,
-                    FileName = inputFile
+                    FileName = command.InputFilePath
                 });
 
-                if (string.IsNullOrEmpty(outputDir))
+                if (string.IsNullOrEmpty(command.OututDirectory))
                 {
-                    outputDir = Environment.CurrentDirectory;
-                }
-
-                if (!Directory.Exists(outputDir))
-                {
-                    Directory.CreateDirectory(outputDir);
-                }
-
-                if (decompilerResult.FileContents.Count == 1)
-                {
-                    StringBuilder? fileNameBuilder = new StringBuilder();
-
-                    if (string.IsNullOrEmpty(inputFile))
+                    if (decompilerResult.FileContents.Count is 1)
                     {
-                        fileNameBuilder.Append(
-                            decompilerResult.FileName.Remove(
-                                decompilerResult.FileName.LastIndexOf(".", StringComparison.Ordinal)));
+                        command.OututDirectory = Environment.CurrentDirectory;
                     }
                     else
                     {
-                        fileNameBuilder.Append(inputFile);
+                        command.OututDirectory = Path.Combine(Environment.CurrentDirectory,
+                            Path.GetFileNameWithoutExtension(command.InputFilePath));
+                    }
+                }
+
+                if (!Directory.Exists(command.OututDirectory))
+                {
+                    Directory.CreateDirectory(command.OututDirectory);
+                }
+
+                if (decompilerResult.FileContents.Count is 1)
+                {
+                    StringBuilder fileNameBuilder = new StringBuilder();
+
+                    if (!Directory.Exists(command.OututDirectory))
+                    {
+                        Directory.CreateDirectory(command.OututDirectory);
                     }
 
-                    fileNameBuilder.Append('.').Append(decompiler.FileExtension());
+                    string fileName = Path.GetFileNameWithoutExtension(string.IsNullOrEmpty(command.OututFileName)
+                        ? command.InputFilePath
+                        : command.OututFileName) + "." + decompiler.FileExtension();
+
+                    fileNameBuilder.Append(Path.Combine(command.OututDirectory, fileName));
 
                     await using StreamWriter fileWriter =
-                        new StreamWriter(Path.Combine(outputDir, fileNameBuilder.ToString()), false, Encoding.ASCII);
+                        new StreamWriter(fileNameBuilder.ToString(), false,
+                            Encoding.ASCII);
 
-                    await fileWriter.BaseStream.WriteAsync(decompilerResult.FileContents[0].Data, 0,
-                        decompilerResult.FileContents[0].Data.Length);
+                    await fileWriter.BaseStream.WriteAsync(decompilerResult.FileContents.First().Data, 0,
+                        decompilerResult.FileContents.First().Data.Length);
 
                     return;
                 }
-                else
+
+                await console.Output.WriteLineAsync($"Found {decompilerResult.FileContents.Count} inner files");
+
+                if (command.OututDirectory == Environment.CurrentDirectory)
                 {
-                    await console.Output.WriteLineAsync($"Found {decompilerResult.FileContents.Count} inner files");
+                    command.OututDirectory = Directory.CreateDirectory(command.InputFilePath).FullName;
+                }
 
-                    if (outputDir == Environment.CurrentDirectory)
+                foreach (FileResult? fileContent in decompilerResult.FileContents)
+                {
+                    string directoryName = Path.Combine(command.OututDirectory,
+                        Path.GetDirectoryName(fileContent.Path)!);
+
+                    string fileName = Path.GetFileNameWithoutExtension(fileContent.Path) + '.' +
+                                      decompiler.FileExtension();
+
+                    if (!Directory.Exists(directoryName))
                     {
-                        outputDir = Directory.CreateDirectory(inputFile).FullName;
+                        Directory.CreateDirectory(directoryName);
                     }
 
-                    foreach (FileResult? fileContent in decompilerResult.FileContents)
-                    {
-                        string? fileName =
-                            fileContent.Path.Remove(fileContent.Path.LastIndexOf(".", StringComparison.Ordinal)) + '.' +
-                            decompiler.FileExtension();
+                    await using StreamWriter fileWriter =
+                        new StreamWriter(Path.Combine(directoryName, fileName), false, Encoding.ASCII);
 
-                        await using StreamWriter fileWriter =
-                            new StreamWriter(Path.Combine(outputDir, fileName), false, Encoding.ASCII);
-
-                        await fileWriter.BaseStream.WriteAsync(fileContent.Data, 0, fileContent.Data.Length);
-                    }
+                    await fileWriter.BaseStream.WriteAsync(fileContent.Data, 0, fileContent.Data.Length);
                 }
 
                 await console.Output.WriteLineAsync("File decompiled successfully");

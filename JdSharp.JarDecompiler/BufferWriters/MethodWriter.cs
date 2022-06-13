@@ -5,7 +5,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
     public class MethodWriter
     {
         public string Type { get; set; } = string.Empty;
-        public List<Argument> Arguments { get; init; } = new();
+        public List<Argument>? Arguments { get; init; } = new();
         public int ArrayDepth { get; set; }
     }
 

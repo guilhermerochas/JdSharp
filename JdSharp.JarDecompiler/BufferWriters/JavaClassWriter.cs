@@ -85,7 +85,13 @@ namespace JdSharp.JarDecompiler.BufferWriters
                 _contentBuilder.Append("class");
             }
 
-            _contentBuilder.Append(' ').Append(_javaClass.ClassFileName).Append(" {").Append('\n');
+            _contentBuilder.Append(' ').Append(ParseClassName(_javaClass.ClassFileName)).Append(" {").Append('\n');
+        }
+
+        public string ParseClassName(string className)
+        {
+            int classNameIndex = _javaClass.ClassFileName.LastIndexOf('/');
+            return classNameIndex is -1 ? className : className[(classNameIndex + 1)..];
         }
 
         private void ParseFields()
@@ -154,7 +160,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
             if (isEnum)
                 return;
 
-            foreach (ClassFileProperties.Method? method in methods)
+            foreach (var method in methods)
             {
                 bool isConstructor = method.Name is ConstructorSpecialMethodName;
 
@@ -181,14 +187,15 @@ namespace JdSharp.JarDecompiler.BufferWriters
                     }
                 }
 
-                MethodWriter? methodWriter = ParserUtils.MethodDescriptorToJava(method);
+                MethodWriter? methodWriter = ParserUtils.MethodDescriptorToJavaV2(method);
                 AppendObjectWithPackage(methodWriter.Type, isConstructor: isConstructor);
 
                 _contentBuilder.Append(string.Concat(Enumerable.Repeat("[]", methodWriter.ArrayDepth)));
-                _contentBuilder.Append(' ').Append(isConstructor ? _javaClass.ClassFileName : method.Name);
+                _contentBuilder.Append(' ')
+                    .Append(isConstructor ? ParseClassName(_javaClass.ClassFileName) : method.Name);
                 _contentBuilder.Append('(');
 
-                for (int i = 0; i < methodWriter.Arguments.Count; i++)
+                for (int i = 0; i < methodWriter.Arguments?.Count; i++)
                 {
                     AppendObjectWithPackage(methodWriter.Arguments[i].Name);
                     _contentBuilder.Append(string.Concat(Enumerable.Repeat("[]", methodWriter.Arguments[i].ArrayDepth)))
@@ -196,7 +203,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
                         .Append($"arg{i}").Append(',');
                 }
 
-                if (methodWriter.Arguments.Any())
+                if (methodWriter.Arguments is { Count: > 0 })
                 {
                     _contentBuilder.Length -= 1;
                 }
@@ -225,7 +232,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
             {
                 if (!description.StartsWith(JavaLangPackageDefinition))
                 {
-                    string import = $"import {description[1..].Replace("/", ".")}";
+                    string import = $"import {description[1..].Replace("/", ".")};";
 
                     if (!_importsList.Contains(import))
                     {

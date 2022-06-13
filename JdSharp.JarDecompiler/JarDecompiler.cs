@@ -64,7 +64,7 @@ namespace JdSharp.JarDecompiler
                     byte[]? buffer = new JavaClassWriter().Write(javaClassFile);
                     fileResults.Add(new FileResult
                     {
-                        Path = entry.Name,
+                        Path = entry.FullName,
                         Data = buffer
                     });
                 }
