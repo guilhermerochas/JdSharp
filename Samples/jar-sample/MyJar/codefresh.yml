@@ -1,0 +1,14 @@
+version: '1.0'
+steps:
+  main_clone:
+    title: Cloning main repository...
+    type: git-clone
+    repo: 'codefresh-contrib/plain-jar-sample-lib'
+    revision: master
+    git: github
+  publish_jar:
+    title: Upload to nexus
+    image: 'maven:3.5.2-jdk-8-alpine'
+    commands:
+      - mvn -Dmaven.repo.local=/codefresh/volume/m2_repository -s settings.xml -Dserver.password=${{NEXUS_PASS}} -Dserver.username=${{NEXUS_USER}}  deploy
+
