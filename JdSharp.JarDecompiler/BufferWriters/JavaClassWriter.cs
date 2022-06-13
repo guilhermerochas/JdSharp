@@ -187,7 +187,7 @@ namespace JdSharp.JarDecompiler.BufferWriters
                     }
                 }
 
-                MethodWriter? methodWriter = ParserUtils.MethodDescriptorToJavaV2(method);
+                MethodWriter? methodWriter = ParserUtils.MethodDescriptorToJava(method);
                 AppendObjectWithPackage(methodWriter.Type, isConstructor: isConstructor);
 
                 _contentBuilder.Append(string.Concat(Enumerable.Repeat("[]", methodWriter.ArrayDepth)));

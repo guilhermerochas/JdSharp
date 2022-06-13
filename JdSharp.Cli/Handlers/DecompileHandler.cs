@@ -21,8 +21,7 @@ namespace JdSharp.Cli.Handlers
                 return;
             }
 
-            (Core.Decompilers.IDecompiler? decompiler, byte[]? signature) =
-                AssemblyUtils.GetDecompilerFromFile(command.InputFilePath);
+            var (decompiler, signature) = AssemblyUtils.GetDecompilerFromFile(command.InputFilePath);
 
             if (decompiler is null)
             {
